@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -10,17 +11,18 @@ from pgvector.psycopg import register_vector
 from ingest import DSN, MODELLO
 
 load_dotenv()
+logger = logging.getLogger("uvicorn.error")
 
 SOGLIA = 0.35   # sotto questa somiglianza il passaggio non e' pertinente
 _modello = None
 
 ISTRUZIONI = (
     "Sei un assistente sulla documentazione ufficiale di Docker. "
-    "Rispondi in italiano usando SOLO i passaggi forniti. "
-    "Se i passaggi non bastano per rispondere, dillo chiaramente senza inventare. "
+    "Rispondi SEMPRE e SOLO in italiano, anche quando non sai rispondere. "
+    "Usa SOLO i passaggi forniti. "
+    "Se i passaggi non bastano, dillo chiaramente in italiano senza inventare. "
     "Cita le fonti con il loro numero tra parentesi quadre, ad esempio [1]."
 )
-
 
 def embed(testo: str):
     global _modello
@@ -62,6 +64,7 @@ def chiedi_llm(domanda: str, passaggi) -> str:
             ],
         )
     except Exception as e:
+        logger.error("Errore LLM: %s", e)
         raise RuntimeError("Errore nel servizio LLM") from e
     return risp.choices[0].message.content
 
