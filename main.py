@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from rag import cerca
+from rag import rispondi
 
 app = FastAPI(title="Docker Docs RAG")
 
@@ -13,11 +13,7 @@ class Domanda(BaseModel):
 
 @app.post("/ask")
 def ask(body: Domanda):
-    risultati = cerca(body.domanda, body.k)
-    return {
-        "domanda": body.domanda,
-        "fonti": [
-            {"source": s, "similarita": round(float(sim), 3), "testo": c}
-            for s, c, sim in risultati
-        ],
-    }
+    try:
+        return rispondi(body.domanda, body.k)
+    except RuntimeError:
+        raise HTTPException(status_code=502, detail="Il servizio LLM non ha risposto")

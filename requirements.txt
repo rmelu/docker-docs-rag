@@ -3,3 +3,5 @@ psycopg[binary]
 pgvector
 fastapi
 uvicorn
+openai
+python-dotenv
