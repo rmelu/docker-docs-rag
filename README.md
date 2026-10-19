@@ -33,7 +33,7 @@ Python, FastAPI, PostgreSQL + pgvector, fastembed, API compatibile OpenAI (Groq)
 ## Avvio
 
 ```bash
-git clone <url-del-repository>
+git clone https://github.com/rmelu/docker-docs-rag.git
 cd Progetto_RAG
 
 python -m venv .venv
