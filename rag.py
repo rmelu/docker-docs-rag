@@ -17,11 +17,15 @@ SOGLIA = 0.35   # sotto questa somiglianza il passaggio non e' pertinente
 _modello = None
 
 ISTRUZIONI = (
-    "Sei un assistente sulla documentazione ufficiale di Docker. "
-    "Rispondi SEMPRE e SOLO in italiano, anche quando non sai rispondere. "
-    "Usa SOLO i passaggi forniti. "
-    "Se i passaggi non bastano, dillo chiaramente in italiano senza inventare. "
-    "Cita le fonti con il loro numero tra parentesi quadre, ad esempio [1]."
+    "You are an assistant for the official Docker documentation. "
+    "Answer using ONLY the passages provided. "
+    "LANGUAGE RULE: reply in the same language as the user's question "
+    "(English question -> English answer; Italian question -> Italian answer), "
+    "even though these instructions are in English. "
+    "Write plain text: no tables and no markdown symbols (no ** or #); "
+    "use at most lists with a dash. "
+    "If the passages are not enough to answer, say so clearly without inventing anything. "
+    "Cite sources with their number in square brackets, for example [1]."
 )
 
 def embed(testo: str):
@@ -60,7 +64,7 @@ def chiedi_llm(domanda: str, passaggi) -> str:
             temperature=0.2,
             messages=[
                 {"role": "system", "content": ISTRUZIONI},
-                {"role": "user", "content": f"Passaggi:\n{contesto}\n\nDomanda: {domanda}"},
+                {"role": "user", "content": f"Passages:\n{contesto}\n\nQuestion: {domanda}\n\n(Reply in the same language as the question above.)"},
             ],
         )
     except Exception as e:
@@ -78,7 +82,8 @@ def rispondi(domanda: str, k: int = 4) -> dict:
     ]
     if not passaggi:
         return {
-            "risposta": "Non ho trovato nella documentazione informazioni pertinenti.",
+            "risposta": "Non ho trovato nella documentazione informazioni pertinenti. / "
+            "I couldn't find relevant information in the documentation.",
             "fonti": [],
         }
     if not os.getenv("LLM_API_KEY"):
